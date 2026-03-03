@@ -1,0 +1,5 @@
+title: "HW2 - mtcars Dashboard"
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
