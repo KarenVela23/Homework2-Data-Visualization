@@ -1,5 +1,113 @@
-title: "HW2 - mtcars Dashboard"
+---
+title: "My HomeWork2"
+#bibliography: testVisual.bib
 output:
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    orientation: rows
+    #social: menu
+    #source_code: https://github.com/KarenVela23/Homework2-Data-Visualization
+    theme: simplex
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(ggplot2)
+library(dplyr)
+
+cars <- mtcars
+```
+
+Row
+-----------------------------------------------------------------------
+
+### THREE-GEAR CARS ARE DOMINANT
+
+```{r}
+gear_data <- cars |>
+  count(gear)
+
+ggplot(gear_data,
+       aes(x = factor(gear),
+           y = n)) +
+  geom_col(fill = "#7A9E7E") +
+  geom_text(aes(label = n),
+            color = "#2F4F6F",
+            size = 8,
+            hjust = 1.2) +
+  coord_flip() +
+  labs(
+    title = "Count of Cars per GEAR",
+    x = "Gear",
+    y = NULL,
+    caption = "Source: mtcars data"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.line.y = element_line(color = "gray40"),
+    axis.line.x = element_blank(),
+    plot.caption = element_text(size = 6, hjust = 1)
+  )
+```
+
+### FEW CARS have SIX or more CARBURATORS
+
+```{r}
+carb_data <- cars |>
+  count(carb)
+
+ggplot(carb_data, aes(x = factor(carb), y = n)) +
+  geom_col(fill = "#4F6F8F") +
+  geom_text(aes(label = n),
+            vjust = -0.5,
+            color = "#2E5E4E",
+            size = 3) +
+  labs(
+    title = "Count of Cars per CARB",
+    x = "CARB",
+    y = NULL,
+    caption = "Source: mtcars data"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.x = element_line(color = "gray40"),
+    plot.caption = element_text(size = 6, hjust = 1)
+  )
+```
+
+Row
+-----------------------------------------------------------------------
+
+### Only 5-gear cars utilize the 6 and 8 carburetor setups.
+
+```{r}
+third_data <- cars |>
+  count(gear, carb, cyl) |>
+  group_by(gear, carb) |>
+  mutate(percent = round(n / sum(n) * 100, 1)) |>
+  ungroup()
+
+ggplot(third_data, aes(x = factor(cyl), y = n)) +
+  geom_col(fill = "#6B8F71") +
+  geom_text(aes(label = paste0(percent, "%")),
+            color = "#2F4F6F",
+            vjust = -0.3,
+            size = 2.5) +
+  facet_grid(gear ~ carb, labeller = label_both) +
+  labs(
+    title = "Distribution of Cylinder Counts by Carburetors and Gears",
+    x = "cylinders",
+    y = "count",
+    caption = "Source: mtcars data"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.caption = element_text(size = 6, hjust = 1)
+  )
+```
+
